@@ -46,6 +46,10 @@ def main(users_csv_path, game_descriptor, authcode):
         payload = {}
         headers = {"Authorization": "Bearer {}".format(token)}
 
+        if game_descriptor not in ["notification(detail)", "tizen(detail)", "selfreport"]:
+            print("gamedescriptor is not supported")
+            return
+
         response = requests.request("GET", data_url, headers=headers, data=payload)
 
         # uncomment the following to save the raw json
@@ -58,7 +62,7 @@ def main(users_csv_path, game_descriptor, authcode):
         data = json.loads(response.text)
         with open(str(index) + "_" + game_descriptor + ".csv", "w") as c:
             c.write("id,session_id,timestamp,name,value\n")
-            if game_descriptor == "selfreport":
+            if game_descriptor == "selfreport" or game_descriptor=="tizen(detail)":
                 for jobj in data:
                     c.write(
                         str(index)
@@ -72,7 +76,7 @@ def main(users_csv_path, game_descriptor, authcode):
                         + str(jobj["propertyInstances"][0]["value"])
                         + "\n"
                     )
-            else:
+            elif game_descriptor=="notification(detail)":
                 for jobj in data:
                     c.write(
                         str(index)
@@ -86,6 +90,9 @@ def main(users_csv_path, game_descriptor, authcode):
                         + str(jobj["propertyInstances"][0]["value"])
                         + "\n"
                     )
+            else:
+                print("gamedescriptor is not supported")
+
 
 
 if __name__ == "__main__":
