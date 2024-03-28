@@ -39,6 +39,7 @@ def main(users_csv_path, game_descriptor, authcode):
 
         player_id = json.loads(response.text)["player"]["id"]
 
+        data_list = []
         for page in range(100):
             if game_descriptor == "selfreport":
                 data_url = (activities_url + "&excludedGds=").format(player_id, page)
@@ -68,51 +69,55 @@ def main(users_csv_path, game_descriptor, authcode):
 
             data = json.loads(response.text)
             if data:
-                with open(
-                    str(index + 1) + "_" + game_descriptor + "_" + str(page) + ".csv",
-                    "w",
-                ) as c:
-                    c.write("id,session_id,timestamp,name,value\n")
-                    if (
-                        game_descriptor == "selfreport"
-                        or game_descriptor == "tizen(detail)"
-                    ):
-                        for jobj in data:
-                            c.write(
-                                str(index + 1)
-                                + ","
-                                + str(jobj["id"])
-                                + ","
-                                + str(jobj["date"])
-                                + ","
-                                + jobj["gameDescriptor"]["translationKey"]
-                                + ","
-                                + str(jobj["propertyInstances"][0]["value"])
-                                + "\n"
-                            )
-                    elif game_descriptor == "notification(detail)":
-                        for jobj in data:
-                            c.write(
-                                str(index + 1)
-                                + ","
-                                + str(jobj["id"])
-                                + ","
-                                + str(jobj["propertyInstances"][1]["value"])
-                                + ","
-                                + jobj["gameDescriptor"]["translationKey"]
-                                + ","
-                                + str(jobj["propertyInstances"][0]["value"])
-                                + "\n"
-                            )
-                    else:
-                        print("gamedescriptor is not supported")
-                    print(
-                        "data of {} is saved successfully page {}".format(
-                            index + 1, page
+                if (
+                    game_descriptor == "selfreport"
+                    or game_descriptor == "tizen(detail)"
+                ):
+                    for jobj in data:
+                        data_list.append(
+                            str(index + 1)
+                            + ","
+                            + str(jobj["id"])
+                            + ","
+                            + str(jobj["date"])
+                            + ","
+                            + jobj["gameDescriptor"]["translationKey"]
+                            + ","
+                            + str(jobj["propertyInstances"][0]["value"])
+                            + "\n"
                         )
-                    )
+                elif game_descriptor == "notification(detail)":
+                    for jobj in data:
+                        data_list.append(
+                            str(index + 1)
+                            + ","
+                            + str(jobj["id"])
+                            + ","
+                            + str(jobj["propertyInstances"][1]["value"])
+                            + ","
+                            + jobj["gameDescriptor"]["translationKey"]
+                            + ","
+                            + str(jobj["propertyInstances"][0]["value"])
+                            + "\n"
+                        )
+                else:
+                    print("gamedescriptor is not supported")
             else:
                 print("no more data for {}".format(index + 1))
+                if len(data_list) > 0:
+                    with open(
+                        str(index + 1)
+                        + "_"
+                        + game_descriptor
+                        + "_"
+                        + str(page)
+                        + ".csv",
+                        "w",
+                    ) as f:
+                        f.write("id,session_id,timestamp,name,value\n")
+                        for row in data_list:
+                            f.write(row)
+                    print("data of {} is saved successfully".format(index + 1))
                 break
 
 
