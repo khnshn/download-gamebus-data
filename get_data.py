@@ -64,7 +64,9 @@ def main(users_csv_path, game_descriptor, authcode):
             # with open(str(index) + "_" + game_descriptor + ".json", "w") as j:
             #     j.write(response.text)
 
-            print("data of {} is fetched successfully page {}".format(index + 1, page))
+            print(
+                "data of {} is fetched successfully page {}".format(index + 1, page + 1)
+            )
             time.sleep(0.5)  # required to ensure the server is responsive
 
             data = json.loads(response.text)
