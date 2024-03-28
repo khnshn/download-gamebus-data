@@ -108,9 +108,11 @@ def main(users_csv_path, game_descriptor, authcode):
                     with open(
                         str(index + 1)
                         + "_"
-                        + game_descriptor
-                        + "_"
-                        + str(page)
+                        + (
+                            "data"
+                            if game_descriptor == "selfreport"
+                            else game_descriptor
+                        )
                         + ".csv",
                         "w",
                     ) as f:
